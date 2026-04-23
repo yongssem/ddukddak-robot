@@ -1,0 +1,131 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 🤖 K-Robot Lab · Metallic Edition
+   폰트: Pretendard(본문) + Space Grotesk(영문·숫자) + Material Symbols(아이콘)
+   — index.html 에서 CDN 로드
+*/
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  font-family: 'Pretendard', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  background-color: #081425;
+  color: #d8e3fb;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Material Symbols — 기본 사이즈/굵기 */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  font-size: 18px;
+  line-height: 1;
+  vertical-align: middle;
+  user-select: none;
+}
+
+@layer utilities {
+  /* 카본 패턴 배경 — 전체 배경 위에 미세 사선 */
+  .carbon-bg {
+    background-color: #081425;
+    background-image: repeating-linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.02) 0px,
+      rgba(255, 255, 255, 0.02) 2px,
+      transparent 2px,
+      transparent 4px
+    );
+  }
+
+  /* 금속 패널 — 135° 그라데이션 + 상/좌 하이라이트 */
+  .brushed-steel {
+    background: linear-gradient(135deg, #1f2a3c, #111c2d);
+    border-top: 1px solid #2f3a4c;
+    border-left: 1px solid #2f3a4c;
+  }
+
+  /* 어두운 홈 — 진행바/입력 배경 */
+  .inset-groove {
+    background-color: #040e1f;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+    border-bottom: 1px solid #1f2a3c;
+  }
+
+  /* 레이저 컷 점선 — 수평 */
+  .laser-divider {
+    background-image: repeating-linear-gradient(
+      to right,
+      #ec6a06 0,
+      #ec6a06 12px,
+      transparent 12px,
+      transparent 20px
+    );
+    background-size: 100% 1px;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
+  /* 레이저 컷 점선 — 수직 */
+  .laser-divider-v {
+    background-image: repeating-linear-gradient(
+      to bottom,
+      #ec6a06 0,
+      #ec6a06 12px,
+      transparent 12px,
+      transparent 20px
+    );
+    background-size: 1px 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
+  /* 네온 글로우 */
+  .neon-glow-blue {
+    box-shadow: 0 0 15px rgba(77, 142, 255, 0.55);
+  }
+  .neon-glow-orange {
+    box-shadow: 0 0 15px rgba(236, 106, 6, 0.6);
+  }
+
+  /* 경고 줄무늬 — CTA 버튼 우측 엣지 */
+  .warning-stripes {
+    background-image: repeating-linear-gradient(
+      45deg,
+      #ec6a06 0,
+      #ec6a06 3px,
+      transparent 3px,
+      transparent 6px
+    );
+  }
+
+  /* 청사진 그리드 — 캔버스 배경 */
+  .blueprint-grid {
+    background-color: #030b17;
+    background-image:
+      linear-gradient(rgba(77, 142, 255, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(77, 142, 255, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+}
+
+/* 스크롤바 — 다크 톤 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #040e1f;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a3548;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #424754;
+}
