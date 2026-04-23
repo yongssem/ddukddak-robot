@@ -42,9 +42,22 @@
 
 import { GENERATED_PARTS } from './parts.generated.js';
 
+// 파일을 수동 삭제한 파츠 id — 탭에는 노출되지 않도록 filter.
+// (parts.generated.js 는 스크립트로 재생성되므로 직접 수정하지 않음)
+const MISSING_IDS = new Set([
+  'weapon2_02', 'weapon2_04', 'weapon2_05', 'weapon2_07', 'weapon2_08',
+  'weapon2_09', 'weapon2_10', 'weapon2_11', 'weapon2_12', 'weapon2_13',
+  'weapon2_14', 'weapon2_15', 'weapon2_17', 'weapon2_18',
+]);
+
 // 파츠 데이터는 scripts/measure_anchors.py 로 자동 생성됨.
 // 앵커 좌표가 어색한 파츠가 있으면 이곳에서 override 가능 (예: PARTS.weapons[0].grip = { x: 40, y: 180 })
-export const PARTS = GENERATED_PARTS;
+export const PARTS = Object.fromEntries(
+  Object.entries(GENERATED_PARTS).map(([cat, list]) => [
+    cat,
+    list.filter((p) => !MISSING_IDS.has(p.id)),
+  ])
+);
 
 // 카테고리 메타 (탭 표시용) — CATEGORIES 에 추가되면 UI 자동 반영
 export const CATEGORIES = [
@@ -70,12 +83,14 @@ export const DEFAULT_LAYER_ORDER = [
 // 캔버스 상수
 // - 내부 좌표계 900x1200 (K-Robot Lab 블루프린트). 부품 배치·드래그 수식이 이 값을 기준으로 동작
 // - 부품 size 는 부품 이미지 원본 픽셀이므로 CANVAS 변경과 무관
-export const CANVAS = {
-  width: 900,
-  height: 1200,
-  // 몸통 기준점 (좌상단) — 캔버스 중앙 근처에 몸통 배치
-  torsoOrigin: { x: 250, y: 360 },
+// 캔버스 프리셋 (PNG 저장 시 해상도 영향)
+export const CANVAS_PRESETS = {
+  portrait: { key: 'portrait', label: '세로',   width: 900,  height: 1200 },
+  wide:     { key: 'wide',     label: '가로',   width: 2700, height: 1200 },
 };
+
+// 기본값 (하위 호환)
+export const CANVAS = CANVAS_PRESETS.wide;
 
 // 무기 손 슬롯 메타
 export const WEAPON_HANDS = [

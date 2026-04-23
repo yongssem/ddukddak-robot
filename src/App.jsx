@@ -4,7 +4,7 @@ import CategoryTabs from './components/CategoryTabs.jsx';
 import PartsLibrary from './components/PartsLibrary.jsx';
 import Canvas from './components/Canvas.jsx';
 import Footer from './components/Footer.jsx';
-import { CANVAS } from './data/partsData.js';
+import { CANVAS_PRESETS } from './data/partsData.js';
 
 // 🤖 뚝딱로봇 · K-ROBOT LAB (Metallic Edition)
 // 레이아웃: 상단바 + 좌측 파츠 데포 + 중앙 블루프린트 (우측 패널 제거, 캔버스 확장)
@@ -15,6 +15,8 @@ export default function App() {
   const [robotName, setRobotName] = useState('');
   const [specialty, setSpecialty] = useState('');
   const [exporting, setExporting] = useState(false);
+  const [canvasKey, setCanvasKey] = useState('wide'); // 'portrait' | 'wide'
+  const canvas = CANVAS_PRESETS[canvasKey];
   const uidCounterRef = useRef(0);
   const canvasRef = useRef(null); // html2canvas 캡처용
 
@@ -25,16 +27,16 @@ export default function App() {
       uidCounterRef.current += 1;
       const rightUid = `item_${uidCounterRef.current}`;
       const halfW = part.size.w / 2;
-      const baseY = (CANVAS.height - part.size.h) / 2;
+      const baseY = (canvas.height - part.size.h) / 2;
       const gap = 20;
       const leftItem = {
         uid: leftUid, partId: part.id, name: `${part.name} (왼팔)`, image: part.image,
-        x: CANVAS.width / 2 - halfW - gap, y: baseY, w: halfW, h: part.size.h,
+        x: canvas.width / 2 - halfW - gap, y: baseY, w: halfW, h: part.size.h,
         rotation: 0, side: 'left',
       };
       const rightItem = {
         uid: rightUid, partId: part.id, name: `${part.name} (오른팔)`, image: part.image,
-        x: CANVAS.width / 2 + gap, y: baseY, w: halfW, h: part.size.h,
+        x: canvas.width / 2 + gap, y: baseY, w: halfW, h: part.size.h,
         rotation: 0, side: 'right',
       };
       setItems((prev) => [...prev, leftItem, rightItem]);
@@ -44,8 +46,8 @@ export default function App() {
 
     uidCounterRef.current += 1;
     const offset = (items.length % 8) * 24;
-    const x = (CANVAS.width - part.size.w) / 2 + offset;
-    const y = (CANVAS.height - part.size.h) / 2 + offset;
+    const x = (canvas.width - part.size.w) / 2 + offset;
+    const y = (canvas.height - part.size.h) / 2 + offset;
     const newItem = {
       uid: `item_${uidCounterRef.current}`,
       partId: part.id, name: part.name, image: part.image,
@@ -122,9 +124,9 @@ export default function App() {
   const canExport = items.length > 0 && !exporting;
 
   return (
-    <div className="min-h-screen flex flex-col carbon-bg">
+    <div className="h-screen flex flex-col overflow-hidden carbon-bg">
       {/* ── TopAppBar ───────────────────────────── */}
-      <header className="sticky top-0 z-50 border-b border-lab-outline bg-gradient-to-br from-lab-surface-high to-lab-bg shadow-panel">
+      <header className="shrink-0 border-b border-lab-outline bg-gradient-to-br from-lab-surface-high to-lab-bg shadow-panel">
         <div className="flex justify-between items-center h-14 px-4 md:px-6">
           <div className="flex items-center gap-3">
             <span className="text-base md:text-lg font-black italic tracking-tight text-lab-blue-strong drop-shadow-[0_0_8px_rgba(77,142,255,0.6)]">
@@ -172,9 +174,9 @@ export default function App() {
       </header>
 
       {/* ── Body: Sidebar + Main ─────────────────── */}
-      <div className="flex flex-1">
+      <div className="flex flex-1 min-h-0">
         {/* Left Sidebar (PARTS_DEPOT) — 데스크탑 전용 */}
-        <aside className="hidden md:flex w-64 shrink-0 flex-col border-r border-lab-outline bg-lab-surface-low">
+        <aside className="hidden md:flex w-60 lg:w-64 shrink-0 flex-col border-r border-lab-outline bg-lab-surface-low min-h-0">
           <div className="p-5 border-b border-lab-outline">
             <div className="flex items-center gap-2 mb-1">
               <div className="w-2.5 h-2.5 rounded-full bg-lab-orange neon-glow-orange" />
@@ -192,20 +194,20 @@ export default function App() {
           </div>
 
           <div className="flex-1 flex flex-col min-h-0">
-            <div className="px-5 py-2.5 font-stat text-[10px] tracking-[0.2em] text-lab-text-muted uppercase flex items-center justify-between">
+            <div className="px-5 py-2.5 font-stat text-[10px] tracking-[0.2em] text-lab-text-muted uppercase flex items-center justify-between shrink-0">
               <span>INVENTORY</span>
               <span className="text-lab-text-muted/70 normal-case tracking-normal text-[10px]">
                 클릭 = 캔버스 추가
               </span>
             </div>
-            <div className="flex-1 overflow-hidden px-3 pb-3">
+            <div className="flex-1 min-h-0 overflow-y-auto px-3 pb-3">
               <PartsLibrary category={category} onSelect={handleSelectPart} />
             </div>
           </div>
         </aside>
 
         {/* Main — 블루프린트 캔버스 단일 패널 */}
-        <main className="flex-1 min-w-0 p-4 md:p-6 flex flex-col gap-4">
+        <main className="flex-1 min-w-0 min-h-0 p-3 md:p-4 flex flex-col gap-3 overflow-hidden">
           {/* 모바일 전용 상단 카테고리 + 파츠 */}
           <div className="md:hidden brushed-steel rounded border border-lab-outline">
             <div className="h-8 bg-lab-surface-highest flex items-center px-3 border-b border-lab-outline">
@@ -222,7 +224,7 @@ export default function App() {
           </div>
 
           {/* Canvas Panel */}
-          <section className="brushed-steel rounded flex flex-col border border-lab-outline overflow-hidden">
+          <section className="brushed-steel rounded flex-1 min-h-0 flex flex-col border border-lab-outline overflow-hidden">
             {/* 헤더 + 인라인 입력 */}
             <div className="bg-lab-surface-highest border-b border-lab-outline px-4 py-2.5 flex flex-wrap items-center gap-x-5 gap-y-2">
               <span className="font-stat text-[11px] tracking-[0.2em] text-lab-text-dim uppercase flex items-center gap-2">
@@ -259,6 +261,27 @@ export default function App() {
               </label>
 
               <div className="ml-auto flex items-center gap-3 font-stat text-[11px] tracking-[0.15em] uppercase">
+                <div className="flex items-center border border-lab-outline rounded overflow-hidden">
+                  {Object.values(CANVAS_PRESETS).map((p) => {
+                    const active = p.key === canvasKey;
+                    return (
+                      <button
+                        key={p.key}
+                        type="button"
+                        onClick={() => setCanvasKey(p.key)}
+                        className={[
+                          'px-2.5 py-1 text-[10px] tracking-[0.15em] uppercase transition',
+                          active
+                            ? 'bg-lab-blue-strong/20 text-lab-blue'
+                            : 'text-lab-text-muted hover:text-lab-blue',
+                        ].join(' ')}
+                        title={`${p.width}×${p.height}`}
+                      >
+                        {p.label} {p.width}×{p.height}
+                      </button>
+                    );
+                  })}
+                </div>
                 <span className="text-lab-tertiary">
                   PARTS <span className="text-lab-blue font-bold">{String(items.length).padStart(2, '0')}</span>
                 </span>
@@ -267,8 +290,9 @@ export default function App() {
             </div>
 
             {/* Canvas body */}
-            <div className="flex-1 flex items-center justify-center p-3 md:p-6 overflow-auto">
+            <div className="flex-1 min-h-0 flex items-center justify-center p-2 md:p-4 overflow-hidden">
               <Canvas
+                canvas={canvas}
                 items={items}
                 selectedUid={selectedUid}
                 onSelect={setSelectedUid}
