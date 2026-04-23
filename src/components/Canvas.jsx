@@ -1,5 +1,5 @@
-import { useRef } from 'react';
-import { CANVAS } from '../data/partsData';
+import { useRef, useState, useLayoutEffect } from 'react';
+import { CANVAS as DEFAULT_CANVAS } from '../data/partsData';
 
 // 🤖 K-Robot Lab · 블루프린트 캔버스
 // - items: 배열 순서 = 레이어 (뒤→앞). side='left'|'right' 면 원본 팔 이미지 절반만 렌더
@@ -7,6 +7,7 @@ import { CANVAS } from '../data/partsData';
 // - codename/specialty: 캔버스 좌하단 ID 플레이트에 렌더 (html2canvas 로 캡처됨)
 // - hideControls: export 중 선택 아웃라인/핸들/플로팅바를 숨겨 깔끔한 PNG 출력
 export default function Canvas({
+  canvas = DEFAULT_CANVAS,
   items,
   selectedUid,
   onSelect,
@@ -19,9 +20,28 @@ export default function Canvas({
   specialty = '',
   hideControls = false,
 }) {
+  const CANVAS = canvas;
   const internalRef = useRef(null);
   const canvasRef = externalRef ?? internalRef;
+  const wrapRef = useRef(null);
   const dragRef = useRef(null);
+  // 부모 영역 안에서 비율 유지한 채 가로·세로 둘 다 맞는 최대 크기로 (스크롤 X)
+  const [displayScale, setDisplayScale] = useState(0);
+
+  useLayoutEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const update = () => {
+      const { width, height } = el.getBoundingClientRect();
+      if (!width || !height) return;
+      const s = Math.min(width / CANVAS.width, height / CANVAS.height);
+      setDisplayScale(s);
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [CANVAS.width, CANVAS.height]);
 
   // 캔버스 CSS 크기 → 내부 좌표(600x800) 비율 (축소 대응)
   const getRectAndScale = () => {
@@ -105,10 +125,12 @@ export default function Canvas({
   const selectedItem = items.find((it) => it.uid === selectedUid) ?? null;
 
   return (
+    <div ref={wrapRef} className="w-full h-full flex items-center justify-center">
+      {displayScale > 0 && (
     <div
       ref={canvasRef}
       className="relative blueprint-grid rounded border border-lab-outline shadow-inner overflow-hidden touch-none select-none"
-      style={{ width: CANVAS.width, height: CANVAS.height }}
+      style={{ width: CANVAS.width * displayScale, height: CANVAS.height * displayScale }}
       onPointerDown={handleBgPointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
@@ -188,6 +210,17 @@ export default function Canvas({
         </div>
       )}
 
+      {/* 내부 좌표계(900×1200)로 렌더되는 파츠 레이어 — displayScale 로 축소 */}
+      <div
+        className="absolute top-0 left-0"
+        style={{
+          width: CANVAS.width,
+          height: CANVAS.height,
+          transform: `scale(${displayScale})`,
+          transformOrigin: 'top left',
+          pointerEvents: 'none',
+        }}
+      >
       {items.map((item) => {
         const selected = !hideControls && item.uid === selectedUid;
         const rotation = item.rotation ?? 0;
@@ -212,6 +245,7 @@ export default function Canvas({
               height: item.h,
               transform: `rotate(${rotation}deg)`,
               transformOrigin: 'center center',
+              pointerEvents: 'auto',
             }}
           >
             {item.side ? (
@@ -275,10 +309,11 @@ export default function Canvas({
           </div>
         );
       })}
+      </div>
 
-      {/* 선택 플로팅 바 — 모바일에서도 즉시 조작 가능하도록 유지 */}
+      {/* 선택 플로팅 바 — 캔버스 상단에 고정 (로봇이 가려지지 않도록 위로 이동) */}
       {selectedItem && !hideControls && (
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1 brushed-steel border border-lab-outline rounded-full shadow-panel px-2 py-1">
+        <div className="absolute top-12 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1 brushed-steel border border-lab-outline rounded-full shadow-panel px-2 py-1">
           <span className="px-2 font-stat text-[10px] tracking-[0.15em] uppercase text-lab-text-dim truncate max-w-[140px]">
             {selectedItem.name}
           </span>
@@ -315,6 +350,8 @@ export default function Canvas({
             <span className="material-symbols-outlined text-[16px]">close</span>
           </button>
         </div>
+      )}
+    </div>
       )}
     </div>
   );
