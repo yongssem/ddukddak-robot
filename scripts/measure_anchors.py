@@ -121,7 +121,7 @@ def build_head(path, part_id, name):
     conn = bottom_center(mask) or (size[0] // 2, size[1] - 1)
     return {
         "id": part_id, "name": name,
-        "image": f"/parts/heads/{path.name}",
+        "image": f"/parts/heads/{path.stem}.webp",
         "size": {"w": size[0], "h": size[1]},
         "connector": {"x": conn[0], "y": conn[1]},
     }
@@ -134,7 +134,7 @@ def build_torso(path, part_id, name):
     arms = shoulder_anchor(mask)
     return {
         "id": part_id, "name": name,
-        "image": f"/parts/torsos/{path.name}",
+        "image": f"/parts/torsos/{path.stem}.webp",
         "size": {"w": size[0], "h": size[1]},
         "anchors": {
             "head": {"x": head[0], "y": head[1]},
@@ -151,7 +151,7 @@ def build_arm(path, part_id, name):
     hr = half_bottom_center(mask, "right") or (size[0] * 3 // 4, size[1] - 1)
     return {
         "id": part_id, "name": name,
-        "image": f"/parts/arms/{path.name}",
+        "image": f"/parts/arms/{path.stem}.webp",
         "size": {"w": size[0], "h": size[1]},
         "connector": {"x": conn[0], "y": conn[1]},
         "hand": {
@@ -166,7 +166,7 @@ def build_leg(path, part_id, name):
     conn = top_center(mask) or (size[0] // 2, 0)
     return {
         "id": part_id, "name": name,
-        "image": f"/parts/legs/{path.name}",
+        "image": f"/parts/legs/{path.stem}.webp",
         "size": {"w": size[0], "h": size[1]},
         "connector": {"x": conn[0], "y": conn[1]},
     }
@@ -177,7 +177,7 @@ def build_weapon(path, part_id, name):
     grip = centroid(mask) or (size[0] // 2, size[1] // 2)
     return {
         "id": part_id, "name": name,
-        "image": f"/parts/weapons/{path.name}",
+        "image": f"/parts/weapons/{path.stem}.webp",
         "size": {"w": size[0], "h": size[1]},
         "grip": {"x": grip[0], "y": grip[1]},
     }
@@ -187,7 +187,7 @@ def build_accessory(path, part_id, name):
     _, size = load_mask(path)
     return {
         "id": part_id, "name": name,
-        "image": f"/parts/accessories/{path.name}",
+        "image": f"/parts/accessories/{path.stem}.webp",
         "size": {"w": size[0], "h": size[1]},
     }
 
@@ -238,8 +238,12 @@ def main():
             prefix = src["prefix"]
             count = src["count"]
             for idx in range(1, count + 1):
+                # 배포용은 WebP. PNG 가 새로 들어왔으면 PNG 를 읽는다 (재생성 뒤 WebP 변환 필요)
                 filename = f"{prefix}_{idx:02d}.png"
                 path = cat_dir / filename
+                if not path.is_file():
+                    filename = f"{prefix}_{idx:02d}.webp"
+                    path = cat_dir / filename
                 if not path.is_file():
                     # 빈 타일 등으로 생성 안 된 경우 — 조용히 스킵
                     continue

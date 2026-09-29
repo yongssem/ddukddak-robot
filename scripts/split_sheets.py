@@ -78,6 +78,8 @@ BG_THRESHOLD = 600
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
 PUBLIC_PARTS = os.path.join(PROJECT_ROOT, "public", "parts")
+# A4 원본 시트는 배포 폴더 밖(sheets/)에 둔다 — 아이들이 받을 일이 없는 파일
+SHEETS_DIR = os.path.join(PROJECT_ROOT, "sheets")
 
 
 def clear_border_band(img: Image.Image, band: int) -> Image.Image:
@@ -194,7 +196,7 @@ def build_tiles(W: int, H: int, cfg: dict):
 
 
 def split_sheet(category: str, cfg: dict) -> int:
-    src_path = os.path.join(PUBLIC_PARTS, category, cfg["file"])
+    src_path = os.path.join(SHEETS_DIR, category, cfg["file"])
     if not os.path.isfile(src_path):
         print(f"  ⚠ 소스 파일 없음: {src_path}")
         return 0

@@ -1,0 +1,9 @@
+{
+  "name": "뚝딱로봇 · K-Robot Lab",
+  "short_name": "뚝딱로봇",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#081425",
+  "theme_color": "#081425",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

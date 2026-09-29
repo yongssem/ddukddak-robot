@@ -336,3 +336,14 @@ Day 4: 마무리
 문의: 용쌤 (mumuclass.kr)
 블로그: 딸깍교실
 Instagram: @yongssam.dev
+---
+
+## 📌 작업 로그 (세션 교대용)
+
+### 2026-09-29 (기기: 클라우드)
+- 완료: 랜딩킷 세팅 — 하단 바(BottomBar.jsx: 사이트·인스타(써 본 뒤)·공유·설치·전체화면·ver 업데이트 내역), 사용 안내 라벨(UsageLabel.jsx), 푸터 이름 링크, PWA(manifest·sw.js 무캐시), favicon.svg(기존 404 해결)
+- 완료: 용량 최적화 — 파츠 132개 PNG→WebP(q90, 투명 유지, 파츠 이미지 약 27.9MB→약 3MB로 추정), parts.generated.js 경로 .webp 로 교체. A4 원본 시트 11장 public/parts → sheets/{카테고리}/ 로 이동(배포 제외, split_sheets.py 경로 수정). 파일이 없던 무기 14종(weapon2_02·04·05·07~15·17·18)은 sheets/weapons/무기.png 에서 다시 잘라 WebP로 복구 → 무기 30종 유지
+- 진행중: 없음
+- 다음: 바이브용샘 확인 — 무기 12(weapon2_04)가 폭 3px 조각으로 잘림, 시트 확인 필요 / usage.js 문구
+- 함정: 파츠 추가 흐름 = sheets/ 에 시트 → split_sheets.py(PNG 출력) → measure_anchors.py(PNG 없으면 WebP 읽음, 경로는 .webp 로 기록) → PNG를 WebP로 변환해야 함(안 하면 404). CLAUDE.md DO 의 '투명 PNG' 는 원본 기준, 배포는 WebP. L1이라 좋아요 미적용
+- 무게: 0.27MB · 24요청 · 이상 없음 (최적화 전 1.09MB)
