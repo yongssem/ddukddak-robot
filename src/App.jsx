@@ -4,6 +4,10 @@ import CategoryTabs from './components/CategoryTabs.jsx';
 import PartsLibrary from './components/PartsLibrary.jsx';
 import Canvas from './components/Canvas.jsx';
 import Footer from './components/Footer.jsx';
+import BottomBar from './components/BottomBar.jsx';
+import UsageLabel from './components/UsageLabel.jsx';
+import { hasPlayed, markPlayed } from './lib/prefs.js';
+import { autoFullscreen } from './lib/fullscreen.js';
 import { CANVAS_PRESETS } from './data/partsData.js';
 
 // 🤖 뚝딱로봇 · K-ROBOT LAB (Metallic Edition)
@@ -16,11 +20,15 @@ export default function App() {
   const [specialty, setSpecialty] = useState('');
   const [exporting, setExporting] = useState(false);
   const [canvasKey, setCanvasKey] = useState('wide'); // 'portrait' | 'wide'
+  const [played, setPlayed] = useState(hasPlayed); // 써 본 흔적 → 인스타 아이콘 조건
   const canvas = CANVAS_PRESETS[canvasKey];
   const uidCounterRef = useRef(0);
   const canvasRef = useRef(null); // html2canvas 캡처용
 
   const handleSelectPart = (part) => {
+    // 첫 조작에 전체화면 + 써 본 흔적 기록
+    autoFullscreen();
+    if (!played) { markPlayed(); setPlayed(true); }
     if (category === 'arms') {
       uidCounterRef.current += 1;
       const leftUid = `item_${uidCounterRef.current}`;
@@ -135,6 +143,7 @@ export default function App() {
             <span className="hidden md:inline-block font-stat text-[10px] tracking-[0.2em] text-lab-text-muted uppercase">
               / K-ROBOT CONSTRUCT
             </span>
+            <div className="hidden sm:block ml-2"><UsageLabel /></div>
           </div>
 
           <div className="flex items-center gap-2">
@@ -171,6 +180,8 @@ export default function App() {
             </button>
           </div>
         </div>
+        {/* 모바일: 사용 안내 라벨은 타이틀 아래 */}
+        <div className="sm:hidden px-4 pb-2"><UsageLabel /></div>
       </header>
 
       {/* ── Body: Sidebar + Main ─────────────────── */}
@@ -310,6 +321,7 @@ export default function App() {
         </main>
       </div>
 
+      <BottomBar played={played} />
       <Footer />
     </div>
   );
